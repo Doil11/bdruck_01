@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blutdruck-Tagebuch</title>
+
+<style>
+:root {
+    --bg: #eef4ff;
+    --card: #ffffff;
+    --text: #172033;
+    --muted: #64748b;
+    --line: #dbe3f0;
+    --accent: #2563eb;
+    --accent-dark: #1d4ed8;
+    --danger: #dc2626;
+    --morning: #f59e0b;
+    --morning-bg: #fff8e7;
+    --afternoon: #f97316;
+    --afternoon-bg: #fff1e8;
+    --evening: #7c3aed;
+    --evening-bg: #f5efff;
+    --pulse: #e11d48;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont,
+                 "Segoe UI", Roboto, sans-serif;
+    background:
+        radial-gradient(circle at top left, #dbeafe 0, transparent 32%),
+        radial-gradient(circle at top right, #ede9fe 0, transparent 30%),
+        var(--bg);
+    color: var(--text);
+}
+
+header {
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
+    color: white;
+    padding: 30px 16px;
+    box-shadow: 0 8px 25px rgba(37, 99, 235, .22);
+}
+
+header h1 {
+    max-width: 1100px;
+    margin: 0 auto 6px;
+    font-size: 30px;
+    letter-spacing: -.5px;
+}
+
+header p {
+    max-width: 1100px;
+    margin: 0 auto;
+    opacity: .92;
+}
+
+main {
+    max-width: 1100px;
+    margin: 28px auto;
+    padding: 0 16px 40px;
+}
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 8px 24px rgba(30, 64, 175, .07);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+h2 {
+    margin: 0 0 14px;
+    font-size: 20px;
+    letter-spacing: -.2px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+
+label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+input,
+button {
+    font: inherit;
+}
+
+input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #cfd4dc;
+    border-radius: 10px;
+    background: white;
+    transition: border-color .15s, box-shadow .15s;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+}
+
+button {
+    border: 0;
+    border-radius: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: transform .15s, box-shadow .15s, background .15s;
+}
+
+button:hover {
+    transform: translateY(-1px);
+}
+
+.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: white;
+    box-shadow: 0 5px 12px rgba(37, 99, 235, .22);
+}
+
+.secondary {
+    background: #e8efff;
+    color: #1e40af;
+}
+
+.danger {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 7px 10px;
+}
+
+.actions {
+    margin-top: 14px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filters {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.metric {
+    background: linear-gradient(145deg, #f8fbff, #eef5ff);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
+}
+
+.metric-title {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.metric strong {
+    display: block;
+    font-size: 24px;
+    margin-top: 5px;
+}
+
+.metric-sub {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.period-title {
+    margin: 22px 0 10px;
+    font-size: 17px;
+}
+
+.period-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.period-card {
+    background: linear-gradient(145deg, #f8fbff, #eef5ff);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
+}
+
+.period-card h3 {
+    margin: 0 0 12px;
+    font-size: 16px;
+}
+
+
+.metric:nth-child(1) {
+    border-left: 4px solid #2563eb;
+}
+
+.metric:nth-child(2) {
+    border-left: 4px solid #4f46e5;
+}
+
+.metric:nth-child(3) {
+    border-left: 4px solid #10b981;
+}
+
+.metric:nth-child(4),
+.metric:nth-child(5) {
+    border-left: 4px solid var(--pulse);
+}
+
+.period-card:nth-child(1) {
+    background: var(--morning-bg);
+    border-color: #fcd98a;
+}
+
+.period-card:nth-child(1) h3 {
+    color: #b45309;
+}
+
+.period-card:nth-child(2) {
+    background: var(--afternoon-bg);
+    border-color: #fdba74;
+}
+
+.period-card:nth-child(2) h3 {
+    color: #c2410c;
+}
+
+.period-card:nth-child(3) {
+    background: var(--evening-bg);
+    border-color: #c4b5fd;
+}
+
+.period-card:nth-child(3) h3 {
+    color: #6d28d9;
+}
+
+.period-value {
+    box-shadow: 0 2px 6px rgba(15, 23, 42, .04);
+}
+
+.period-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.period-value {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 9px;
+}
+
+.period-value span {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.period-value strong {
+    display: block;
+    font-size: 19px;
+    margin-top: 2px;
+}
+
+.period-count {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+.muted {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.table-wrap {
+    overflow: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+th,
+td {
+    text-align: left;
+    padding: 10px 9px;
+    border-bottom: 1px solid var(--line);
+}
+
+th {
+    background: #eef4ff;
+    color: #334155;
+    font-size: 13px;
+}
+
+tbody tr:hover {
+    background: #f8fbff;
+}
+
+.empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 24px;
+}
+
+@media (max-width: 800px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .filters {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .filters button {
+        grid-column: 1 / -1;
+    }
+
+    .summary {
+        grid-template-columns: 1fr;
+    }
+
+    .period-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 500px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Blutdruck-Tagebuch</h1>
+    <p>
+        Messungen speichern und nach einem frei wählbaren Zeitraum auswerten.
+    </p>
+</header>
+
+<main>
+
+    <!-- Neue Messung -->
+    <section class="card">
+        <h2>Neue Messung</h2>
+
+        <form id="measurementForm">
+            <div class="grid">
+
+                <label>
+                    Datum
+                    <input id="date" type="date" required>
+                </label>
+
+                <label>
+                    Uhrzeit
+                    <input id="time" type="time" required>
+                </label>
+
+                <label>
+                    Systolisch
+                    <input
+                        id="systolic"
+                        type="number"
+                        min="50"
+                        max="300"
+                        required
+                    >
+                </label>
+
+                <label>
+                    Diastolisch
+                    <input
+                        id="diastolic"
+                        type="number"
+                        min="30"
+                        max="200"
+                        required
+                    >
+                </label>
+
+                <label>
+                    Puls
+                    <input
+                        id="pulse"
+                        type="number"
+                        min="20"
+                        max="250"
+                        required
+                    >
+                </label>
+
+            </div>
+
+            <div class="actions">
+                <button class="primary" type="submit">
+                    Messung speichern
+                </button>
+            </div>
+        </form>
+    </section>
+
+
+    <!-- Auswertung -->
+    <section class="card">
+
+        <h2>Auswertung</h2>
+
+        <div class="filters">
+
+            <label>
+                Von
+                <input id="from" type="date">
+            </label>
+
+            <label>
+                Bis
+                <input id="to" type="date">
+            </label>
+
+            <button
+                class="secondary"
+                id="todayBtn"
+                type="button"
+            >
+                Heute
+            </button>
+
+        </div>
+
+
+        <!-- Gesamtwerte -->
+        <div class="summary">
+
+            <div class="metric">
+                <div class="metric-title">
+                    Durchschnitt Blutdruck
+                </div>
+
+                <strong id="overallAvgBP">
+                    –
+                </strong>
+
+                <div class="metric-sub">
+                    Systolisch / Diastolisch
+                </div>
+            </div>
+
+
+            <div class="metric">
+                <div class="metric-title">
+                    Median Blutdruck
+                </div>
+
+                <strong id="overallMedianBP">
+                    –
+                </strong>
+
+                <div class="metric-sub">
+                    Systolisch / Diastolisch
+                </div>
+            </div>
+
+
+            <div class="metric">
+                <div class="metric-title">
+                    Anzahl Messungen
+                </div>
+
+                <strong id="count">
+                    0
+                </strong>
+            </div>
+
+
+            <div class="metric">
+                <div class="metric-title">
+                    Durchschnitt Puls
+                </div>
+
+                <strong id="overallAvgPulse">
+                    –
+                </strong>
+            </div>
+
+
+            <div class="metric">
+                <div class="metric-title">
+                    Median Puls
+                </div>
+
+                <strong id="overallMedianPulse">
+                    –
+                </strong>
+            </div>
+
+        </div>
+
+
+        <!-- Tageszeiten -->
+        <h3 class="period-title">
+            Durchschnitt und Median nach Tageszeit
+        </h3>
+
+        <div class="period-grid">
+
+            <!-- Früh -->
+            <div class="period-card">
+
+                <h3>Früh</h3>
+
+                <div class="muted">
+                    03:00 Uhr bis 12:00 Uhr
+                </div>
+
+                <br>
+
+                <div class="period-row">
+
+                    <div class="period-value">
+                        <span>Ø Blutdruck</span>
+                        <strong id="morningAvgBP">–</strong>
+                    </div>
+
+                    <div class="period-value">
+                        <span>Median Blutdruck</span>
+                        <strong id="morningMedianBP">–</strong>
+                    </div>
+
+                </div>
+
+                <div class="period-row">
+
+                    <div class="period-value">
+                        <span>Ø Puls</span>
+                        <strong id="morningAvgPulse">–</strong>
+                    </div>
+
+                    <div class="period-value">
+                        <span>Median Puls</span>
+                        <strong id="morningMedianPulse">–</strong>
+                    </div>
+
+                </div>
+
+                <div class="period-count">
+                    Messungen: <strong id="morningCount">0</strong>
+                </div>
+
+            </div>
+
+
+            <!-- Nachmittag -->
+            <div class="period-card">
+
+                <h3>Nachmittag</h3>
+
+                <div class="muted">
+                    12:00 Uhr bis 18:00 Uhr
+                </div>
+
+                <br>
+
+                <div class="period-row">
+
+                    <div class="period-value">
+                        <span>Ø Blutdruck</span>
+                        <strong id="afternoonAvgBP">–</strong>
+                    </div>
+
+                    <div class="period-value">
+                        <span>Median Blutdruck</span>
+                        <strong id="afternoonMedianBP">–</strong>
+                    </div>
+
+                </div>
+
+                <div class="period-row">
+
+                    <div class="period-value">
+                        <span>Ø Puls</span>
+                        <strong id="afternoonAvgPulse">–</strong>
+                    </div>
+
+                    <div class="period-value">
+                        <span>Median Puls</span>
+                        <strong id="afternoonMedianPulse">–</strong>
+                    </div>
+
+                </div>
+
+                <div class="period-count">
+                    Messungen: <strong id="afternoonCount">0</strong>
+                </div>
+
+            </div>
+
+
+            <!-- Abend -->
+            <div class="period-card">
+
+                <h3>Abend</h3>
+
+                <div class="muted">
+                    18:00 Uhr bis 03:00 Uhr
+                </div>
+
+                <br>
+
+                <div class="period-row">
+
+                    <div class="period-value">
+                        <span>Ø Blutdruck</span>
+                        <strong id="eveningAvgBP">–</strong>
+                    </div>
+
+                    <div class="period-value">
+                        <span>Median Blutdruck</span>
+                        <strong id="eveningMedianBP">–</strong>
+                    </div>
+
+                </div>
+
+                <div class="period-row">
+
+                    <div class="period-value">
+                        <span>Ø Puls</span>
+                        <strong id="eveningAvgPulse">–</strong>
+                    </div>
+
+                    <div class="period-value">
+                        <span>Median Puls</span>
+                        <strong id="eveningMedianPulse">–</strong>
+                    </div>
+
+                </div>
+
+                <div class="period-count">
+                    Messungen: <strong id="eveningCount">0</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- Alle Messwerte -->
+    <section class="card">
+
+        <h2>Alle Messwerte</h2>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Datum</th>
+                        <th>Uhrzeit</th>
+                        <th>Systolisch</th>
+                        <th>Diastolisch</th>
+                        <th>Puls</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody id="measurementsBody"></tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+
+const STORAGE_KEY = "blutdruck_messungen_v1";
+
+let measurements =
+    JSON.parse(
+        localStorage.getItem(STORAGE_KEY) || "[]"
+    );
+
+
+const $ = id =>
+    document.getElementById(id);
+
+
+/* Durchschnitt */
+
+function avg(values) {
+
+    return values.length
+        ? values.reduce((a,b) => a + b, 0) / values.length
+        : NaN;
+
+}
+
+
+/* Median */
+
+function median(values) {
+
+    if (!values.length)
+        return NaN;
+
+    const sorted =
+        [...values].sort(
+            (a,b) => a - b
+        );
+
+    const middle =
+        Math.floor(sorted.length / 2);
+
+    if (sorted.length % 2) {
+
+        return sorted[middle];
+
+    }
+
+    return (
+        sorted[middle - 1] +
+        sorted[middle]
+    ) / 2;
+
+}
+
+
+/* Zahlen ohne Einheit */
+
+function fmt(number) {
+
+    if (!Number.isFinite(number))
+        return "–";
+
+    return number
+        .toFixed(1)
+        .replace(".0", "");
+
+}
+
+
+/* Statistik */
+
+function stats(list) {
+
+    return {
+
+        n: list.length,
+
+        systolicAvg:
+            avg(
+                list.map(
+                    x => x.systolic
+                )
+            ),
+
+        systolicMedian:
+            median(
+                list.map(
+                    x => x.systolic
+                )
+            ),
+
+        diastolicAvg:
+            avg(
+                list.map(
+                    x => x.diastolic
+                )
+            ),
+
+        diastolicMedian:
+            median(
+                list.map(
+                    x => x.diastolic
+                )
+            ),
+
+        pulseAvg:
+            avg(
+                list.map(
+                    x => x.pulse
+                )
+            ),
+
+        pulseMedian:
+            median(
+                list.map(
+                    x => x.pulse
+                )
+            )
+
+    };
+
+}
+
+
+/* Zeitraum */
+
+function selectedMeasurements() {
+
+    const from =
+        $("from").value;
+
+    const to =
+        $("to").value;
+
+
+    return measurements.filter(m => {
+
+        return (
+            (!from || m.date >= from) &&
+            (!to || m.date <= to)
+        );
+
+    });
+
+}
+
+
+/* Speichern */
+
+function persist() {
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(measurements)
+    );
+
+}
+
+
+/* Neue Messung */
+
+$("measurementForm").addEventListener(
+    "submit",
+    function(e) {
+
+        e.preventDefault();
+
+
+        measurements.push({
+
+            id:
+                crypto.randomUUID
+                ? crypto.randomUUID()
+                : String(
+                    Date.now() +
+                    Math.random()
+                ),
+
+            date:
+                $("date").value,
+
+            time:
+                $("time").value,
+
+            systolic:
+                Number(
+                    $("systolic").value
+                ),
+
+            diastolic:
+                Number(
+                    $("diastolic").value
+                ),
+
+            pulse:
+                Number(
+                    $("pulse").value
+                )
+
+        });
+
+
+        persist();
+
+
+        $("systolic").value = "";
+        $("diastolic").value = "";
+        $("pulse").value = "";
+
+
+        render();
+
+    }
+);
+
+
+/* Filter */
+
+$("from").addEventListener(
+    "change",
+    render
+);
+
+$("to").addEventListener(
+    "change",
+    render
+);
+
+
+/* Heute */
+
+$("todayBtn").addEventListener(
+    "click",
+    function() {
+
+        const today =
+            new Date()
+            .toISOString()
+            .slice(0,10);
+
+
+        $("from").value =
+            today;
+
+        $("to").value =
+            today;
+
+
+        render();
+
+    }
+);
+
+
+/* Statistik in eine Tageszeit-Karte schreiben */
+
+function renderPeriod(prefix, list) {
+
+    const s =
+        stats(list);
+
+
+    $(prefix + "AvgBP").textContent =
+        s.n
+        ? `${fmt(s.systolicAvg)} / ${fmt(s.diastolicAvg)}`
+        : "–";
+
+
+    $(prefix + "MedianBP").textContent =
+        s.n
+        ? `${fmt(s.systolicMedian)} / ${fmt(s.diastolicMedian)}`
+        : "–";
+
+
+    $(prefix + "AvgPulse").textContent =
+        s.n
+        ? fmt(s.pulseAvg)
+        : "–";
+
+
+    $(prefix + "MedianPulse").textContent =
+        s.n
+        ? fmt(s.pulseMedian)
+        : "–";
+
+
+    $(prefix + "Count").textContent =
+        s.n;
+
+}
+
+
+/* Hauptanzeige */
+
+function render() {
+
+    const selected =
+        selectedMeasurements();
+
+
+    /*
+     * Gesamt
+     */
+
+    const overall =
+        stats(selected);
+
+
+    $("overallAvgBP").textContent =
+        overall.n
+        ? `${fmt(overall.systolicAvg)} / ${fmt(overall.diastolicAvg)}`
+        : "–";
+
+
+    $("overallMedianBP").textContent =
+        overall.n
+        ? `${fmt(overall.systolicMedian)} / ${fmt(overall.diastolicMedian)}`
+        : "–";
+
+
+    $("overallAvgPulse").textContent =
+        overall.n
+        ? fmt(overall.pulseAvg)
+        : "–";
+
+
+    $("overallMedianPulse").textContent =
+        overall.n
+        ? fmt(overall.pulseMedian)
+        : "–";
+
+
+    $("count").textContent =
+        overall.n;
+
+
+    /*
+     * Tageszeiten
+     *
+     * Früh:
+     * 03:00 bis vor 12:00
+     *
+     * Nachmittag:
+     * 12:00 bis vor 18:00
+     *
+     * Abend:
+     * 18:00 bis vor 03:00
+     */
+
+    const morning = [];
+    const afternoon = [];
+    const evening = [];
+
+
+    selected.forEach(m => {
+
+        const hour =
+            Number(
+                m.time.slice(0,2)
+            );
+
+
+        if (
+            hour >= 3 &&
+            hour < 12
+        ) {
+
+            morning.push(m);
+
+        }
+
+        else if (
+            hour >= 12 &&
+            hour < 18
+        ) {
+
+            afternoon.push(m);
+
+        }
+
+        else {
+
+            evening.push(m);
+
+        }
+
+    });
+
+
+    renderPeriod(
+        "morning",
+        morning
+    );
+
+
+    renderPeriod(
+        "afternoon",
+        afternoon
+    );
+
+
+    renderPeriod(
+        "evening",
+        evening
+    );
+
+
+    /*
+     * Alle Messungen
+     */
+
+    const all =
+        [...measurements]
+        .sort(
+            (a,b) =>
+                (b.date + b.time)
+                .localeCompare(
+                    a.date + a.time
+                )
+        );
+
+
+    $("measurementsBody").innerHTML =
+        "";
+
+
+    all.forEach(m => {
+
+        $("measurementsBody")
+            .insertAdjacentHTML(
+                "beforeend",
+
+                `
+                <tr>
+
+                    <td>${m.date}</td>
+
+                    <td>${m.time}</td>
+
+                    <td>${m.systolic}</td>
+
+                    <td>${m.diastolic}</td>
+
+                    <td>${m.pulse}</td>
+
+                    <td>
+
+                        <button
+                            class="danger"
+                            onclick="removeMeasurement('${m.id}')"
+                        >
+                            Löschen
+                        </button>
+
+                    </td>
+
+                </tr>
+                `
+            );
+
+    });
+
+
+    if (!all.length) {
+
+        $("measurementsBody").innerHTML =
+            `
+            <tr>
+                <td colspan="6" class="empty">
+                    Noch keine Messungen gespeichert.
+                </td>
+            </tr>
+            `;
+
+    }
+
+}
+
+
+/* Löschen */
+
+function removeMeasurement(id) {
+
+    measurements =
+        measurements.filter(
+            m => m.id !== id
+        );
+
+
+    persist();
+
+    render();
+
+}
+
+
+/* Datum und Uhrzeit vorbelegen */
+
+const now =
+    new Date();
+
+
+$("date").value =
+    now.toISOString()
+       .slice(0,10);
+
+
+$("time").value =
+    String(
+        now.getHours()
+    ).padStart(2,"0")
+    + ":" +
+    String(
+        now.getMinutes()
+    ).padStart(2,"0");
+
+
+/* Start */
+
+render();
+
+</script>
+
+</body>
+</html>
