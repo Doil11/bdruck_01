@@ -3,1236 +3,168 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blutdruck-Tagebuch</title>
-
+<title>Finanzübersicht</title>
 <style>
-:root {
-    --bg: #eef4ff;
-    --card: #ffffff;
-    --text: #172033;
-    --muted: #64748b;
-    --line: #dbe3f0;
-    --accent: #2563eb;
-    --accent-dark: #1d4ed8;
-    --danger: #dc2626;
-    --morning: #f59e0b;
-    --morning-bg: #fff8e7;
-    --afternoon: #f97316;
-    --afternoon-bg: #fff1e8;
-    --evening: #7c3aed;
-    --evening-bg: #f5efff;
-    --pulse: #e11d48;
+:root{
+  --bg:#f2f2f7;--card:rgba(255,255,255,.92);--text:#111827;--muted:#8a8a92;
+  --accent:#007aff;--green:#34c759;--red:#ff3b30;--border:#e5e5ea
 }
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont,
-                 "Segoe UI", Roboto, sans-serif;
-    background:
-        radial-gradient(circle at top left, #dbeafe 0, transparent 32%),
-        radial-gradient(circle at top right, #ede9fe 0, transparent 30%),
-        var(--bg);
-    color: var(--text);
-}
-
-header {
-    background: linear-gradient(135deg, #2563eb, #4f46e5);
-    color: white;
-    padding: 30px 16px;
-    box-shadow: 0 8px 25px rgba(37, 99, 235, .22);
-}
-
-header h1 {
-    max-width: 1100px;
-    margin: 0 auto 6px;
-    font-size: 30px;
-    letter-spacing: -.5px;
-}
-
-header p {
-    max-width: 1100px;
-    margin: 0 auto;
-    opacity: .92;
-}
-
-main {
-    max-width: 1100px;
-    margin: 28px auto;
-    padding: 0 16px 40px;
-}
-
-.card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 18px;
-    margin-bottom: 18px;
-    box-shadow: 0 8px 24px rgba(30, 64, 175, .07);
-    transition: transform .18s ease, box-shadow .18s ease;
-}
-
-h2 {
-    margin: 0 0 14px;
-    font-size: 20px;
-    letter-spacing: -.2px;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 12px;
-}
-
-label {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    font-weight: 600;
-    font-size: 14px;
-}
-
-input,
-button {
-    font: inherit;
-}
-
-input {
-    width: 100%;
-    padding: 11px 12px;
-    border: 1px solid #cfd4dc;
-    border-radius: 10px;
-    background: white;
-    transition: border-color .15s, box-shadow .15s;
-}
-
-input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
-}
-
-button {
-    border: 0;
-    border-radius: 10px;
-    padding: 10px 16px;
-    cursor: pointer;
-    font-weight: 700;
-    transition: transform .15s, box-shadow .15s, background .15s;
-}
-
-button:hover {
-    transform: translateY(-1px);
-}
-
-.primary {
-    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-    color: white;
-    box-shadow: 0 5px 12px rgba(37, 99, 235, .22);
-}
-
-.secondary {
-    background: #e8efff;
-    color: #1e40af;
-}
-
-.danger {
-    background: #fee2e2;
-    color: #991b1b;
-    padding: 7px 10px;
-}
-
-.actions {
-    margin-top: 14px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.filters {
-    display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 12px;
-    align-items: end;
-}
-
-.summary {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-top: 14px;
-}
-
-.metric {
-    background: linear-gradient(145deg, #f8fbff, #eef5ff);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 14px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
-}
-
-.metric-title {
-    color: var(--muted);
-    font-size: 13px;
-}
-
-.metric strong {
-    display: block;
-    font-size: 24px;
-    margin-top: 5px;
-}
-
-.metric-sub {
-    color: var(--muted);
-    font-size: 13px;
-    margin-top: 5px;
-}
-
-.period-title {
-    margin: 22px 0 10px;
-    font-size: 17px;
-}
-
-.period-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-}
-
-.period-card {
-    background: linear-gradient(145deg, #f8fbff, #eef5ff);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 14px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.8);
-}
-
-.period-card h3 {
-    margin: 0 0 12px;
-    font-size: 16px;
-}
-
-
-.metric:nth-child(1) {
-    border-left: 4px solid #2563eb;
-}
-
-.metric:nth-child(2) {
-    border-left: 4px solid #4f46e5;
-}
-
-.metric:nth-child(3) {
-    border-left: 4px solid #10b981;
-}
-
-.metric:nth-child(4),
-.metric:nth-child(5) {
-    border-left: 4px solid var(--pulse);
-}
-
-.period-card:nth-child(1) {
-    background: var(--morning-bg);
-    border-color: #fcd98a;
-}
-
-.period-card:nth-child(1) h3 {
-    color: #b45309;
-}
-
-.period-card:nth-child(2) {
-    background: var(--afternoon-bg);
-    border-color: #fdba74;
-}
-
-.period-card:nth-child(2) h3 {
-    color: #c2410c;
-}
-
-.period-card:nth-child(3) {
-    background: var(--evening-bg);
-    border-color: #c4b5fd;
-}
-
-.period-card:nth-child(3) h3 {
-    color: #6d28d9;
-}
-
-.period-value {
-    box-shadow: 0 2px 6px rgba(15, 23, 42, .04);
-}
-
-.period-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.period-value {
-    background: white;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 9px;
-}
-
-.period-value span {
-    display: block;
-    color: var(--muted);
-    font-size: 12px;
-}
-
-.period-value strong {
-    display: block;
-    font-size: 19px;
-    margin-top: 2px;
-}
-
-.period-count {
-    color: var(--muted);
-    font-size: 13px;
-    margin-top: 10px;
-}
-
-.muted {
-    color: var(--muted);
-    font-size: 13px;
-}
-
-.table-wrap {
-    overflow: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 700px;
-}
-
-th,
-td {
-    text-align: left;
-    padding: 10px 9px;
-    border-bottom: 1px solid var(--line);
-}
-
-th {
-    background: #eef4ff;
-    color: #334155;
-    font-size: 13px;
-}
-
-tbody tr:hover {
-    background: #f8fbff;
-}
-
-.empty {
-    text-align: center;
-    color: var(--muted);
-    padding: 24px;
-}
-
-@media (max-width: 800px) {
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .filters {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .filters button {
-        grid-column: 1 / -1;
-    }
-
-    .summary {
-        grid-template-columns: 1fr;
-    }
-
-    .period-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 500px) {
-    .grid {
-        grid-template-columns: 1fr;
-    }
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif;
+background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+.container{width:100%;max-width:520px;margin:auto;padding:env(safe-area-inset-top) 16px calc(34px + env(safe-area-inset-bottom))}
+header{padding:18px 4px 16px;display:flex;justify-content:space-between;align-items:flex-start}
+h1{margin:0;font-size:30px;line-height:1.1;letter-spacing:-.7px}
+h2{margin:0 0 14px;font-size:20px;letter-spacing:-.2px}
+.muted{color:var(--muted)}
+header .muted{font-size:14px;margin-top:6px}
+header .secondary{padding:8px 10px;font-size:13px;border-radius:10px}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat{padding:16px;border-radius:17px;background:var(--card);border:1px solid rgba(0,0,0,.04);box-shadow:0 5px 20px rgba(0,0,0,.045)}
+.stat:first-child{grid-column:1/-1}
+.stat span{font-size:13px}
+.stat strong{display:block;font-size:26px;letter-spacing:-.7px;margin-top:4px}
+.card{background:var(--card);border:1px solid rgba(0,0,0,.04);border-radius:20px;padding:18px;box-shadow:0 5px 20px rgba(0,0,0,.045);margin-bottom:14px}
+.grid{display:flex;flex-direction:column;gap:0}
+form{display:grid;gap:11px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label.small{display:block;font-size:12px;color:var(--muted);margin:0 0 5px 3px}
+input,select,button{font:inherit;-webkit-appearance:none}
+input,select{width:100%;height:48px;padding:0 13px;border:1px solid var(--border);border-radius:13px;background:#fff;color:var(--text);font-size:16px;outline:none}
+input:focus,select:focus{border-color:#8dbfff;box-shadow:0 0 0 3px rgba(0,122,255,.10)}
+button{border:0;cursor:pointer;font-weight:650;min-height:44px;border-radius:13px;transition:transform .08s}
+button:active{transform:scale(.98)}
+.primary{background:var(--accent);color:#fff}
+.secondary{background:#e9e9ee;color:#3a3a3c}
+.danger{background:#ffe5e3;color:#d70015;min-height:30px;padding:5px 9px;font-size:12px;border-radius:9px}
+.expenses{margin-top:23px}
+.expense{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid var(--border)}
+.expense:last-child{border-bottom:0;padding-bottom:2px}
+.expense strong{font-size:15px}.amount{font-weight:750;font-size:15px;white-space:nowrap}
+.small{font-size:12px}
+.empty{padding:20px 5px;text-align:center;color:var(--muted);font-size:14px}
+.chart-wrap{display:flex;justify-content:center;align-items:center;padding:2px 0 4px}
+canvas{width:min(280px,100%);height:auto}
+.legend{display:grid;gap:10px;margin-top:8px}
+.legend-item{display:flex;justify-content:space-between;align-items:center;font-size:14px}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:8px}
+.category-list{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;gap:6px;background:#f0f0f5;padding:8px 9px 8px 12px;border-radius:999px;font-size:13px}
+@media(min-width:700px){
+  .container{max-width:1000px;padding-top:28px}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
+  .card{margin-bottom:0}
+  .summary{grid-template-columns:repeat(3,1fr)}
+  .stat:first-child{grid-column:auto}
 }
 </style>
 </head>
-
 <body>
-
+<div class="container">
 <header>
-    <h1>Blutdruck-Tagebuch</h1>
-    <p>
-        Messungen speichern und nach einem frei wählbaren Zeitraum auswerten.
-    </p>
+  <div><h1>Finanzen</h1><div class="muted">Deine Ausgaben auf einen Blick</div></div>
 </header>
 
-<main>
-
-    <!-- Neue Messung -->
-    <section class="card">
-        <h2>Neue Messung</h2>
-
-        <form id="measurementForm">
-            <div class="grid">
-
-                <label>
-                    Datum
-                    <input id="date" type="date" required>
-                </label>
-
-                <label>
-                    Uhrzeit
-                    <input id="time" type="time" required>
-                </label>
-
-                <label>
-                    Systolisch
-                    <input
-                        id="systolic"
-                        type="number"
-                        min="50"
-                        max="300"
-                        required
-                    >
-                </label>
-
-                <label>
-                    Diastolisch
-                    <input
-                        id="diastolic"
-                        type="number"
-                        min="30"
-                        max="200"
-                        required
-                    >
-                </label>
-
-                <label>
-                    Puls
-                    <input
-                        id="pulse"
-                        type="number"
-                        min="20"
-                        max="250"
-                        required
-                    >
-                </label>
-
-            </div>
-
-            <div class="actions">
-                <button class="primary" type="submit">
-                    Messung speichern
-                </button>
-            </div>
-        </form>
-    </section>
-
-
-    <!-- Auswertung -->
-    <section class="card">
-
-        <h2>Auswertung</h2>
-
-        <div class="filters">
-
-            <label>
-                Von
-                <input id="from" type="date">
-            </label>
-
-            <label>
-                Bis
-                <input id="to" type="date">
-            </label>
-
-            <button
-                class="secondary"
-                id="todayBtn"
-                type="button"
-            >
-                Heute
-            </button>
-
-        </div>
-
-
-        <!-- Gesamtwerte -->
-        <div class="summary">
-
-            <div class="metric">
-                <div class="metric-title">
-                    Durchschnitt Blutdruck
-                </div>
-
-                <strong id="overallAvgBP">
-                    –
-                </strong>
-
-                <div class="metric-sub">
-                    Systolisch / Diastolisch
-                </div>
-            </div>
-
-
-            <div class="metric">
-                <div class="metric-title">
-                    Median Blutdruck
-                </div>
-
-                <strong id="overallMedianBP">
-                    –
-                </strong>
-
-                <div class="metric-sub">
-                    Systolisch / Diastolisch
-                </div>
-            </div>
-
-
-            <div class="metric">
-                <div class="metric-title">
-                    Anzahl Messungen
-                </div>
-
-                <strong id="count">
-                    0
-                </strong>
-            </div>
-
-
-            <div class="metric">
-                <div class="metric-title">
-                    Durchschnitt Puls
-                </div>
-
-                <strong id="overallAvgPulse">
-                    –
-                </strong>
-            </div>
-
-
-            <div class="metric">
-                <div class="metric-title">
-                    Median Puls
-                </div>
-
-                <strong id="overallMedianPulse">
-                    –
-                </strong>
-            </div>
-
-        </div>
-
-
-        <!-- Tageszeiten -->
-        <h3 class="period-title">
-            Durchschnitt und Median nach Tageszeit
-        </h3>
-
-        <div class="period-grid">
-
-            <!-- Früh -->
-            <div class="period-card">
-
-                <h3>Früh</h3>
-
-                <div class="muted">
-                    03:00 Uhr bis 12:00 Uhr
-                </div>
-
-                <br>
-
-                <div class="period-row">
-
-                    <div class="period-value">
-                        <span>Ø Blutdruck</span>
-                        <strong id="morningAvgBP">–</strong>
-                    </div>
-
-                    <div class="period-value">
-                        <span>Median Blutdruck</span>
-                        <strong id="morningMedianBP">–</strong>
-                    </div>
-
-                </div>
-
-                <div class="period-row">
-
-                    <div class="period-value">
-                        <span>Ø Puls</span>
-                        <strong id="morningAvgPulse">–</strong>
-                    </div>
-
-                    <div class="period-value">
-                        <span>Median Puls</span>
-                        <strong id="morningMedianPulse">–</strong>
-                    </div>
-
-                </div>
-
-                <div class="period-count">
-                    Messungen: <strong id="morningCount">0</strong>
-                </div>
-
-            </div>
-
-
-            <!-- Nachmittag -->
-            <div class="period-card">
-
-                <h3>Nachmittag</h3>
-
-                <div class="muted">
-                    12:00 Uhr bis 18:00 Uhr
-                </div>
-
-                <br>
-
-                <div class="period-row">
-
-                    <div class="period-value">
-                        <span>Ø Blutdruck</span>
-                        <strong id="afternoonAvgBP">–</strong>
-                    </div>
-
-                    <div class="period-value">
-                        <span>Median Blutdruck</span>
-                        <strong id="afternoonMedianBP">–</strong>
-                    </div>
-
-                </div>
-
-                <div class="period-row">
-
-                    <div class="period-value">
-                        <span>Ø Puls</span>
-                        <strong id="afternoonAvgPulse">–</strong>
-                    </div>
-
-                    <div class="period-value">
-                        <span>Median Puls</span>
-                        <strong id="afternoonMedianPulse">–</strong>
-                    </div>
-
-                </div>
-
-                <div class="period-count">
-                    Messungen: <strong id="afternoonCount">0</strong>
-                </div>
-
-            </div>
-
-
-            <!-- Abend -->
-            <div class="period-card">
-
-                <h3>Abend</h3>
-
-                <div class="muted">
-                    18:00 Uhr bis 03:00 Uhr
-                </div>
-
-                <br>
-
-                <div class="period-row">
-
-                    <div class="period-value">
-                        <span>Ø Blutdruck</span>
-                        <strong id="eveningAvgBP">–</strong>
-                    </div>
-
-                    <div class="period-value">
-                        <span>Median Blutdruck</span>
-                        <strong id="eveningMedianBP">–</strong>
-                    </div>
-
-                </div>
-
-                <div class="period-row">
-
-                    <div class="period-value">
-                        <span>Ø Puls</span>
-                        <strong id="eveningAvgPulse">–</strong>
-                    </div>
-
-                    <div class="period-value">
-                        <span>Median Puls</span>
-                        <strong id="eveningMedianPulse">–</strong>
-                    </div>
-
-                </div>
-
-                <div class="period-count">
-                    Messungen: <strong id="eveningCount">0</strong>
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- Alle Messwerte -->
-    <section class="card">
-
-        <h2>Alle Messwerte</h2>
-
-        <div class="table-wrap">
-
-            <table>
-
-                <thead>
-                    <tr>
-                        <th>Datum</th>
-                        <th>Uhrzeit</th>
-                        <th>Systolisch</th>
-                        <th>Diastolisch</th>
-                        <th>Puls</th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <tbody id="measurementsBody"></tbody>
-
-            </table>
-
-        </div>
-
-    </section>
-
-</main>
-
+<div class="summary">
+  <div class="stat"><span class="muted">Ausgaben gesamt</span><strong id="total">0,00 €</strong></div>
+  <div class="stat"><span class="muted">Anzahl Ausgaben</span><strong id="count">0</strong></div>
+  <div class="stat"><span class="muted">Kategorien</span><strong id="catCount">0</strong></div>
+</div>
+
+<div class="grid">
+<section class="card">
+  <h2>Neue Ausgabe</h2>
+  <form id="expenseForm">
+    <div class="row">
+      <div><label class="small">Betrag (€)</label><input id="amount" type="number" min="0.01" step="0.01" placeholder="z. B. 12,50" required></div>
+      <div><label class="small">Kategorie</label><select id="category"></select></div>
+    </div>
+    <div><label class="small">Beschreibung (optional)</label><input id="description" maxlength="80" placeholder="z. B. Wocheneinkauf"></div>
+    <button class="primary" type="submit">Ausgabe hinzufügen</button>
+  </form>
+
+  <div class="expenses">
+    <h2>Ausgaben</h2>
+    <div id="expenseList"></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Ausgaben nach Kategorie</h2>
+  <div class="chart-wrap"><canvas id="pie" width="320" height="320"></canvas></div>
+  <div id="legend" class="legend"></div>
+</section>
+</div>
+
+<section class="card" style="margin-top:18px">
+  <h2>Kategorien</h2>
+  <div class="row">
+    <div><input id="newCategory" maxlength="30" placeholder="Neue Kategorie, z. B. Freizeit"></div>
+    <button class="primary" onclick="addCategory()">Hinzufügen</button>
+  </div>
+  <div id="categoryList" class="category-list" style="margin-top:14px"></div><button class="secondary" style="width:100%;margin-top:14px" onclick="resetData()">Alle Daten zurücksetzen</button>
+</section>
+</div>
 
 <script>
+const defaultCategories=["Essen","Drogerie","Sonstiges"];
+let data=JSON.parse(localStorage.getItem("financeApp")||"null")||{categories:defaultCategories,expenses:[]};
+const colors=["#4f46e5","#16a34a","#f59e0b","#dc2626","#0891b2","#9333ea","#db2777","#65a30d","#ea580c","#475569"];
 
-const STORAGE_KEY = "blutdruck_messungen_v1";
-
-let measurements =
-    JSON.parse(
-        localStorage.getItem(STORAGE_KEY) || "[]"
-    );
-
-
-const $ = id =>
-    document.getElementById(id);
-
-
-/* Durchschnitt */
-
-function avg(values) {
-
-    return values.length
-        ? values.reduce((a,b) => a + b, 0) / values.length
-        : NaN;
-
+function euro(n){return new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR"}).format(n)}
+function save(){localStorage.setItem("financeApp",JSON.stringify(data));render()}
+function addCategory(){
+  const el=document.getElementById("newCategory"), name=el.value.trim();
+  if(!name)return;
+  if(data.categories.some(c=>c.toLowerCase()===name.toLowerCase())){alert("Diese Kategorie gibt es bereits.");return}
+  data.categories.push(name);el.value="";save();
 }
-
-
-/* Median */
-
-function median(values) {
-
-    if (!values.length)
-        return NaN;
-
-    const sorted =
-        [...values].sort(
-            (a,b) => a - b
-        );
-
-    const middle =
-        Math.floor(sorted.length / 2);
-
-    if (sorted.length % 2) {
-
-        return sorted[middle];
-
-    }
-
-    return (
-        sorted[middle - 1] +
-        sorted[middle]
-    ) / 2;
-
+function deleteCategory(i){
+  const name=data.categories[i];
+  if(data.expenses.some(e=>e.category===name)){alert("Die Kategorie kann nicht gelöscht werden, solange Ausgaben darin vorhanden sind.");return}
+  if(data.categories.length===1){alert("Mindestens eine Kategorie muss vorhanden sein.");return}
+  data.categories.splice(i,1);save();
 }
-
-
-/* Zahlen ohne Einheit */
-
-function fmt(number) {
-
-    if (!Number.isFinite(number))
-        return "–";
-
-    return number
-        .toFixed(1)
-        .replace(".0", "");
-
+document.getElementById("expenseForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const amount=parseFloat(document.getElementById("amount").value);
+  const category=document.getElementById("category").value;
+  const description=document.getElementById("description").value.trim();
+  if(!amount||amount<=0)return;
+  data.expenses.unshift({id:Date.now(),amount,category,description,date:new Date().toLocaleDateString("de-DE")});
+  e.target.reset();save();
+});
+function deleteExpense(id){data.expenses=data.expenses.filter(e=>e.id!==id);save()}
+function resetData(){if(confirm("Wirklich alle Ausgaben und eigenen Kategorien löschen?")){data={categories:[...defaultCategories],expenses:[]};save()}}
+function render(){
+  const total=data.expenses.reduce((s,e)=>s+e.amount,0);
+  document.getElementById("total").textContent=euro(total);
+  document.getElementById("count").textContent=data.expenses.length;
+  document.getElementById("catCount").textContent=data.categories.length;
+  document.getElementById("category").innerHTML=data.categories.map(c=>`<option>${escapeHtml(c)}</option>`).join("");
+  document.getElementById("categoryList").innerHTML=data.categories.map((c,i)=>`<span class="chip">${escapeHtml(c)} <button class="danger" onclick="deleteCategory(${i})">×</button></span>`).join("");
+  const list=document.getElementById("expenseList");
+  list.innerHTML=data.expenses.length?data.expenses.map(e=>`<div class="expense"><div><strong>${escapeHtml(e.category)}</strong><div class="muted small">${escapeHtml(e.description||"Keine Beschreibung")} · ${e.date}</div></div><div style="display:flex;align-items:center;gap:10px"><span class="amount">${euro(e.amount)}</span><button class="danger" onclick="deleteExpense(${e.id})">Löschen</button></div></div>`).join(""):'<div class="empty">Noch keine Ausgaben vorhanden.</div>';
+  drawChart();
 }
-
-
-/* Statistik */
-
-function stats(list) {
-
-    return {
-
-        n: list.length,
-
-        systolicAvg:
-            avg(
-                list.map(
-                    x => x.systolic
-                )
-            ),
-
-        systolicMedian:
-            median(
-                list.map(
-                    x => x.systolic
-                )
-            ),
-
-        diastolicAvg:
-            avg(
-                list.map(
-                    x => x.diastolic
-                )
-            ),
-
-        diastolicMedian:
-            median(
-                list.map(
-                    x => x.diastolic
-                )
-            ),
-
-        pulseAvg:
-            avg(
-                list.map(
-                    x => x.pulse
-                )
-            ),
-
-        pulseMedian:
-            median(
-                list.map(
-                    x => x.pulse
-                )
-            )
-
-    };
-
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function drawChart(){
+  const canvas=document.getElementById("pie"),ctx=canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const sums={};data.expenses.forEach(e=>sums[e.category]=(sums[e.category]||0)+e.amount);
+  const entries=Object.entries(sums),total=entries.reduce((s,[,v])=>s+v,0),cx=160,cy=160,r=120;
+  if(!entries.length){ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle="#eef0f4";ctx.fill();ctx.fillStyle="#6b7280";ctx.font="15px system-ui";ctx.textAlign="center";ctx.fillText("Noch keine Daten",cx,cy+5);document.getElementById("legend").innerHTML="";return}
+  let start=-Math.PI/2;
+  entries.forEach(([name,val],i)=>{
+    const angle=val/total*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,start,start+angle);ctx.closePath();ctx.fillStyle=colors[i%colors.length];ctx.fill();start+=angle;
+  });
+  ctx.beginPath();ctx.arc(cx,cy,58,0,Math.PI*2);ctx.fillStyle="#fff";ctx.fill();
+  ctx.fillStyle="#172033";ctx.font="700 17px system-ui";ctx.textAlign="center";ctx.fillText(euro(total),cx,cy+6);
+  document.getElementById("legend").innerHTML=entries.map(([name,val],i)=>`<div class="legend-item"><span><i class="dot" style="background:${colors[i%colors.length]}"></i>${escapeHtml(name)}</span><strong>${euro(val)}</strong></div>`).join("");
 }
-
-
-/* Zeitraum */
-
-function selectedMeasurements() {
-
-    const from =
-        $("from").value;
-
-    const to =
-        $("to").value;
-
-
-    return measurements.filter(m => {
-
-        return (
-            (!from || m.date >= from) &&
-            (!to || m.date <= to)
-        );
-
-    });
-
-}
-
-
-/* Speichern */
-
-function persist() {
-
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(measurements)
-    );
-
-}
-
-
-/* Neue Messung */
-
-$("measurementForm").addEventListener(
-    "submit",
-    function(e) {
-
-        e.preventDefault();
-
-
-        measurements.push({
-
-            id:
-                crypto.randomUUID
-                ? crypto.randomUUID()
-                : String(
-                    Date.now() +
-                    Math.random()
-                ),
-
-            date:
-                $("date").value,
-
-            time:
-                $("time").value,
-
-            systolic:
-                Number(
-                    $("systolic").value
-                ),
-
-            diastolic:
-                Number(
-                    $("diastolic").value
-                ),
-
-            pulse:
-                Number(
-                    $("pulse").value
-                )
-
-        });
-
-
-        persist();
-
-
-        $("systolic").value = "";
-        $("diastolic").value = "";
-        $("pulse").value = "";
-
-
-        render();
-
-    }
-);
-
-
-/* Filter */
-
-$("from").addEventListener(
-    "change",
-    render
-);
-
-$("to").addEventListener(
-    "change",
-    render
-);
-
-
-/* Heute */
-
-$("todayBtn").addEventListener(
-    "click",
-    function() {
-
-        const today =
-            new Date()
-            .toISOString()
-            .slice(0,10);
-
-
-        $("from").value =
-            today;
-
-        $("to").value =
-            today;
-
-
-        render();
-
-    }
-);
-
-
-/* Statistik in eine Tageszeit-Karte schreiben */
-
-function renderPeriod(prefix, list) {
-
-    const s =
-        stats(list);
-
-
-    $(prefix + "AvgBP").textContent =
-        s.n
-        ? `${fmt(s.systolicAvg)} / ${fmt(s.diastolicAvg)}`
-        : "–";
-
-
-    $(prefix + "MedianBP").textContent =
-        s.n
-        ? `${fmt(s.systolicMedian)} / ${fmt(s.diastolicMedian)}`
-        : "–";
-
-
-    $(prefix + "AvgPulse").textContent =
-        s.n
-        ? fmt(s.pulseAvg)
-        : "–";
-
-
-    $(prefix + "MedianPulse").textContent =
-        s.n
-        ? fmt(s.pulseMedian)
-        : "–";
-
-
-    $(prefix + "Count").textContent =
-        s.n;
-
-}
-
-
-/* Hauptanzeige */
-
-function render() {
-
-    const selected =
-        selectedMeasurements();
-
-
-    /*
-     * Gesamt
-     */
-
-    const overall =
-        stats(selected);
-
-
-    $("overallAvgBP").textContent =
-        overall.n
-        ? `${fmt(overall.systolicAvg)} / ${fmt(overall.diastolicAvg)}`
-        : "–";
-
-
-    $("overallMedianBP").textContent =
-        overall.n
-        ? `${fmt(overall.systolicMedian)} / ${fmt(overall.diastolicMedian)}`
-        : "–";
-
-
-    $("overallAvgPulse").textContent =
-        overall.n
-        ? fmt(overall.pulseAvg)
-        : "–";
-
-
-    $("overallMedianPulse").textContent =
-        overall.n
-        ? fmt(overall.pulseMedian)
-        : "–";
-
-
-    $("count").textContent =
-        overall.n;
-
-
-    /*
-     * Tageszeiten
-     *
-     * Früh:
-     * 03:00 bis vor 12:00
-     *
-     * Nachmittag:
-     * 12:00 bis vor 18:00
-     *
-     * Abend:
-     * 18:00 bis vor 03:00
-     */
-
-    const morning = [];
-    const afternoon = [];
-    const evening = [];
-
-
-    selected.forEach(m => {
-
-        const hour =
-            Number(
-                m.time.slice(0,2)
-            );
-
-
-        if (
-            hour >= 3 &&
-            hour < 12
-        ) {
-
-            morning.push(m);
-
-        }
-
-        else if (
-            hour >= 12 &&
-            hour < 18
-        ) {
-
-            afternoon.push(m);
-
-        }
-
-        else {
-
-            evening.push(m);
-
-        }
-
-    });
-
-
-    renderPeriod(
-        "morning",
-        morning
-    );
-
-
-    renderPeriod(
-        "afternoon",
-        afternoon
-    );
-
-
-    renderPeriod(
-        "evening",
-        evening
-    );
-
-
-    /*
-     * Alle Messungen
-     */
-
-    const all =
-        [...measurements]
-        .sort(
-            (a,b) =>
-                (b.date + b.time)
-                .localeCompare(
-                    a.date + a.time
-                )
-        );
-
-
-    $("measurementsBody").innerHTML =
-        "";
-
-
-    all.forEach(m => {
-
-        $("measurementsBody")
-            .insertAdjacentHTML(
-                "beforeend",
-
-                `
-                <tr>
-
-                    <td>${m.date}</td>
-
-                    <td>${m.time}</td>
-
-                    <td>${m.systolic}</td>
-
-                    <td>${m.diastolic}</td>
-
-                    <td>${m.pulse}</td>
-
-                    <td>
-
-                        <button
-                            class="danger"
-                            onclick="removeMeasurement('${m.id}')"
-                        >
-                            Löschen
-                        </button>
-
-                    </td>
-
-                </tr>
-                `
-            );
-
-    });
-
-
-    if (!all.length) {
-
-        $("measurementsBody").innerHTML =
-            `
-            <tr>
-                <td colspan="6" class="empty">
-                    Noch keine Messungen gespeichert.
-                </td>
-            </tr>
-            `;
-
-    }
-
-}
-
-
-/* Löschen */
-
-function removeMeasurement(id) {
-
-    measurements =
-        measurements.filter(
-            m => m.id !== id
-        );
-
-
-    persist();
-
-    render();
-
-}
-
-
-/* Datum und Uhrzeit vorbelegen */
-
-const now =
-    new Date();
-
-
-$("date").value =
-    now.toISOString()
-       .slice(0,10);
-
-
-$("time").value =
-    String(
-        now.getHours()
-    ).padStart(2,"0")
-    + ":" +
-    String(
-        now.getMinutes()
-    ).padStart(2,"0");
-
-
-/* Start */
-
 render();
-
 </script>
-
 </body>
 </html>
