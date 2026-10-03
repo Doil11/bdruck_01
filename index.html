@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -8,9 +9,9 @@
 <title>Finanzen</title>
 <style>
 :root{
-  --bg:#f5f7fb;--text:#172033;--muted:#7b8496;--card:#fff;--blue:#4f46e5;
-  --green:#16a34a;--green-bg:#eaf9ef;--red:#ef4444;--red-bg:#fff0f0;
-  --purple:#8b5cf6;--line:#edf0f5;--shadow:0 10px 30px rgba(30,40,70,.08)
+  --bg:#f4f6fb;--text:#20283b;--muted:#69758a;--card:#ffffff;--blue:#5367d8;
+  --green:#16866a;--green-bg:#e4f6ef;--red:#c84f62;--red-bg:#fff0f1;
+  --purple:#8064c9;--line:#e4e9f2;--shadow:0 8px 24px rgba(31,45,80,.07)
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,Arial,sans-serif}
@@ -38,8 +39,8 @@ select:focus,input:focus{border-color:#a5b4fc;background:#fff}
 .stat.blue{background:#eef2ff}.stat.blue .value{color:var(--blue)}
 .stat.gray{background:#f2f4f8}.stat.gray .value{color:#596273}
 .form-card{position:relative;overflow:hidden}
-.form-card.income{background:linear-gradient(135deg,#f0fff5,#fff)}
-.form-card.expense{background:linear-gradient(135deg,#fff5f5,#fff)}
+.form-card.income{background:linear-gradient(135deg,#e8f7f1,#ffffff 78%);border:1px solid #d2eee3}
+.form-card.expense{background:linear-gradient(135deg,#fff0f2,#ffffff 78%);border:1px solid #f6d9de}
 .form-icon{font-size:28px;margin-bottom:8px}
 .form-title{font-size:21px;font-weight:850;margin-bottom:14px}
 .form-grid{display:grid;gap:10px}
@@ -83,6 +84,17 @@ canvas{width:100%;height:100%;display:block}
 .tag button{background:transparent;color:#9aa2b1;padding:0;font-size:15px}
 .danger{background:#fff1f2;color:#be123c;width:100%;padding:13px;border-radius:14px;font-weight:800}
 @media(min-width:650px){.summary{grid-template-columns:repeat(4,1fr)}.charts-grid{grid-template-columns:1fr 1fr}.form-grid.two{grid-template-columns:1fr 1fr}}
+/* Feinschliff: klare Farben und bessere Orientierung */
+.card h2{letter-spacing:-.02em}
+.form-title{letter-spacing:-.025em}
+input,select{transition:border-color .18s,box-shadow .18s,background .18s}
+input:focus,select:focus{box-shadow:0 0 0 3px rgba(83,103,216,.12)}
+.add-btn{transition:transform .15s,filter .15s}
+.add-btn:active{transform:scale(.99);filter:brightness(.96)}
+.stat.green{background:linear-gradient(135deg,#e4f6ef,#f4fcf8)}
+.stat.red{background:linear-gradient(135deg,#fff0f1,#fff8f8)}
+.stat.blue{background:linear-gradient(135deg,#edf0ff,#f8f9ff)}
+.stat.gray{background:linear-gradient(135deg,#eef1f6,#fafbfc)}
 </style>
 </head>
 <body>
@@ -111,8 +123,17 @@ canvas{width:100%;height:100%;display:block}
   <div class="form-icon">💚</div><div class="form-title">Einnahme</div>
   <div class="form-grid two">
     <input id="incomeAmount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Betrag in €">
-    <input id="incomeText" type="text" placeholder="Wofür? z. B. Gehalt">
+    <select id="incomeCategory" aria-label="Art der Einnahme">
+      <option value="Gehalt">Gehalt</option>
+      <option value="Kindergeld">Kindergeld</option>
+      <option value="Nebenjob">Nebenjob</option>
+      <option value="Geschenk">Geschenk</option>
+      <option value="Sonstiges">Sonstiges</option>
+    </select>
   </div>
+  <input id="incomeText" style="margin-top:10px" type="text" placeholder="Notiz (optional)">
+  <label class="hint" for="incomeDate">Datum der Einnahme</label>
+  <input id="incomeDate" type="date" style="margin-top:6px">
   <button class="add-btn green" onclick="addIncome()">＋ Einnahme hinzufügen</button>
 </section>
 
@@ -122,7 +143,9 @@ canvas{width:100%;height:100%;display:block}
     <input id="expenseAmount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Betrag in €">
     <select id="expenseCategory"></select>
   </div>
-  <input id="expenseText" style="margin-top:10px" type="text" placeholder="Wofür? z. B. Mittagessen, Shampoo">
+  <input id="expenseText" style="margin-top:10px" type="text" placeholder="Notiz (optional), z. B. Mittagessen">
+  <label class="hint" for="expenseDate">Datum der Ausgabe</label>
+  <input id="expenseDate" type="date" style="margin-top:6px">
   <button class="add-btn red" onclick="addExpense()">＋ Ausgabe hinzufügen</button>
 </section>
 
@@ -215,18 +238,33 @@ function renderSummary(){
 }
 function addIncome(){
   const amount=parseFloat(document.getElementById("incomeAmount").value.replace(",","."));
-  const text=document.getElementById("incomeText").value.trim()||"Einnahme";
+  const category=document.getElementById("incomeCategory").value;
+  const note=document.getElementById("incomeText").value.trim();
+  const date=document.getElementById("incomeDate").value || currentMonth()+"-15";
+  const text=note || category;
   if(!(amount>0)) return alert("Bitte einen gültigen Betrag eingeben.");
-  state.transactions.push({id:crypto.randomUUID(),type:"income",amount,text,category:"",date:currentMonth()+"-15"});
-  save();document.getElementById("incomeAmount").value="";document.getElementById("incomeText").value="";render();
+  if(monthKey(date)!==currentMonth()) return alert("Bitte ein Datum im ausgewählten Monat wählen.");
+  state.transactions.push({id:crypto.randomUUID(),type:"income",amount,text,category,date});
+  save();
+  document.getElementById("incomeAmount").value="";
+  document.getElementById("incomeText").value="";
+  document.getElementById("incomeDate").value=currentMonth()+"-15";
+  render();
 }
 function addExpense(){
   const amount=parseFloat(document.getElementById("expenseAmount").value.replace(",","."));
   const category=document.getElementById("expenseCategory").value;
-  const text=document.getElementById("expenseText").value.trim()||category;
+  const note=document.getElementById("expenseText").value.trim();
+  const date=document.getElementById("expenseDate").value || currentMonth()+"-15";
+  const text=note || category;
   if(!(amount>0)) return alert("Bitte einen gültigen Betrag eingeben.");
-  state.transactions.push({id:crypto.randomUUID(),type:"expense",amount,text,category,date:currentMonth()+"-15"});
-  save();document.getElementById("expenseAmount").value="";document.getElementById("expenseText").value="";render();
+  if(monthKey(date)!==currentMonth()) return alert("Bitte ein Datum im ausgewählten Monat wählen.");
+  state.transactions.push({id:crypto.randomUUID(),type:"expense",amount,text,category,date});
+  save();
+  document.getElementById("expenseAmount").value="";
+  document.getElementById("expenseText").value="";
+  document.getElementById("expenseDate").value=currentMonth()+"-15";
+  render();
 }
 function addCategory(){
   const input=document.getElementById("newCategory"), name=input.value.trim();
@@ -267,7 +305,7 @@ function renderTransactions(){
     }
     return `<div class="tx">
       <div class="tx-icon ${t.type}">${t.type==="income"?"↗":"↘"}</div>
-      <div class="tx-main"><div class="tx-text">${esc(t.text)}</div><div class="tx-meta">${t.type==="expense"?esc(t.category)+" · ":""}${new Date(t.date+"T12:00:00").toLocaleDateString("de-DE")}</div></div>
+      <div class="tx-main"><div class="tx-text">${esc(t.text)}</div><div class="tx-meta">${t.category?esc(t.category)+" · ":""}${new Date(t.date+"T12:00:00").toLocaleDateString("de-DE")}</div></div>
       <div class="tx-amount ${t.type}">${t.type==="income"?"+":"−"} ${euro(t.amount)}</div>
       <div class="tx-actions"><button class="icon-btn" onclick="startEdit('${t.id}')" aria-label="Bearbeiten">✎</button><button class="icon-btn delete" onclick="removeTx('${t.id}')" aria-label="Löschen">×</button></div>
     </div>`;
@@ -310,7 +348,16 @@ function drawCharts(){
 function renderCategories(){
   document.getElementById("categories").innerHTML=state.categories.map(c=>`<div class="tag">${esc(c)} <button onclick="removeCategory('${esc(c).replace(/'/g,"\\'")}')" aria-label="Kategorie löschen">×</button></div>`).join("");
 }
-function render(){refreshMonths();renderCategorySelect();renderSummary();renderTransactions();renderCategories();drawCharts()}
+function render(){
+  refreshMonths();
+  renderCategorySelect();
+  const defaultDate=currentMonth()+"-15";
+  ["incomeDate","expenseDate"].forEach(id=>{
+    const field=document.getElementById(id);
+    if(field && (!field.value || monthKey(field.value)!==currentMonth())) field.value=defaultDate;
+  });
+  renderSummary();renderTransactions();renderCategories();drawCharts();
+}
 function resetAll(){if(confirm("Wirklich alle Einnahmen, Ausgaben und Kategorien löschen?")){state=structuredClone(defaults);save();render()}}
 render();
 window.addEventListener("resize",drawCharts);
